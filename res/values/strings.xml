@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, DashCamActivity!</string>
+    <string name="app_name">DashCam</string>
+	<string name="GPS">GPS</string>
+	<string name="Camera">Camera</string>
+</resources>
