@@ -3,7 +3,6 @@ package com.raymond.dashcam;
 import com.raymond.dashcam.Functions.Screens;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,14 +29,13 @@ public class DashCamActivity extends Activity {
     
     private OnClickListener _listenerGPS = new OnClickListener() {
         public void onClick(View v) {
-        	Intent i = new Intent();
         	_functions.changeScreen(Screens.GPS);
         }
     };
     
     private OnClickListener _listenerCamera = new OnClickListener() {
         public void onClick(View v) {
-        	_functions.makeToast("Hello Camera");
+        	_functions.changeScreen(Screens.CAMERA);
         }
     };
 }

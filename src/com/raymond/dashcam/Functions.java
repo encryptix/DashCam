@@ -3,13 +3,16 @@ package com.raymond.dashcam;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.provider.Settings;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class Functions {
 	public enum Screens {
-	    HOME,GPS,CAMERA 
+	    HOME,GPS,CAMERA, GPSSETTING 
 	}
 	
 	
@@ -65,7 +68,19 @@ public class Functions {
             _parent.startActivity(i);
             break;
         case CAMERA:
-        	int c = 4;
+        	i.setClassName("com.raymond.dashcam", "com.raymond.dashcam.CameraScreen");
+            _parent.startActivity(i);
+        	break;
+        case GPSSETTING:
+        	i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        	_parent.startActivity(i);
+        	break;
     	}
     }
+    
+    OnClickListener listenerHome = new OnClickListener() {
+        public void onClick(View v) {
+        	_instance.changeScreen(Screens.HOME);
+        }
+    };
 }

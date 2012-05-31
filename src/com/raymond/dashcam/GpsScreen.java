@@ -6,7 +6,9 @@ import java.util.Date;
 import com.raymond.dashcam.Functions.Screens;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
@@ -38,20 +40,26 @@ public class GpsScreen extends Activity implements LocationListener{
         _function = Functions.getInstance();
         _home = _function.getButton(this,R.id.B_gps_Home);
         _data = _function.getTextView(this, R.id.TB_gps_data);
-        _home.setOnClickListener(_listenerHome);
+        _home.setOnClickListener(_function.listenerHome);
         
         _noOfFixes=0;
         _lm = (LocationManager) getSystemService(LOCATION_SERVICE);
-        
-        //_lm.addGpsStatusListener(this);
     }
-    
-    private OnClickListener _listenerHome = new OnClickListener() {
-        public void onClick(View v) {
-        	_function.makeToast("test gps screen");
-        	_function.changeScreen(Screens.HOME);
+        
+    private DialogInterface.OnClickListener _enableGpsPromptListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which){
+            case DialogInterface.BUTTON_POSITIVE:
+            	_function.changeScreen(Screens.GPSSETTING);
+                break;
+            case DialogInterface.BUTTON_NEGATIVE:
+                _function.changeScreen(Screens.HOME);
+                break;
+            }
         }
     };
+    
 
     @Override
 	public void onResume() {
@@ -76,9 +84,8 @@ public class GpsScreen extends Activity implements LocationListener{
    
     @Override
 	public void onProviderDisabled(String arg0) {
-		_function.makeToast("onProviderDisabled Called");
-    	Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-    	startActivity(intent);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Enable GPS?").setPositiveButton("Yes", _enableGpsPromptListener).setNegativeButton("No", _enableGpsPromptListener).show();
 	}
 
     @Override
@@ -112,14 +119,11 @@ public class GpsScreen extends Activity implements LocationListener{
 		String orientation = ""+location.getBearing();
 		String speed = ""+location.getSpeed();
 		
-		Bundle extra = location.getExtras();
-		String extraStr = extra.toString();
-		
 		long timestamp = location.getTime();
 		_function.makeToast("TS: "+timestamp);
 		Date date = new Date(timestamp);
 		String time = date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
-		String data = "Lat/Long: "+latitude+","+longitude+"\nSpeed/Orien: "+speed+","+orientation+"\nExtra: "+extraStr+"\nFixes: "+_noOfFixes+"\nTime: "+time;
+		String data = "Lat/Long: "+latitude+","+longitude+"\nSpeed/Orien: "+speed+","+orientation+"\nFixes: "+_noOfFixes+"\nTime: "+time;
 		_data.setText(data);
 		
 		try{
