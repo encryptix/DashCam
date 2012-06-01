@@ -3,6 +3,7 @@ package com.raymond.dashcam;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.provider.Settings;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -83,4 +84,9 @@ public class Functions {
         	_instance.changeScreen(Screens.HOME);
         }
     };
+    
+    public void foo(){
+    	PackageManager pm = _parent.getPackageManager();
+    	//pm.
+    }
 }
