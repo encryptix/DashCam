@@ -5,17 +5,15 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.raymond.dashcam.datastructure.DataPoint;
+
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.hardware.Camera;
-import android.hardware.Camera.CameraInfo;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.Environment;
 import android.util.Log;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.widget.FrameLayout;
 
 public class CameraLive implements SurfaceHolder.Callback, OnInfoListener 
@@ -28,7 +26,7 @@ public class CameraLive implements SurfaceHolder.Callback, OnInfoListener
 
     private SurfaceHolder   mHolder;
     private MediaRecorder   mRecorder;
-    private CameraOverlay     mCameraView;
+    private CameraOverlay   mCameraView;
     private Context         mContext;
     private FrameLayout     mParent;
     private int             mState;
@@ -47,10 +45,12 @@ public class CameraLive implements SurfaceHolder.Callback, OnInfoListener
     }
 
 
-    private void Init()
+    private String Init()
     {
     	InitWithoutNewFile();
-        mRecorder.setOutputFile(getOutputMediaFile().toString());
+    	String outputFileName = getOutputMediaFile().toString();
+        mRecorder.setOutputFile(outputFileName);
+    	return outputFileName;
     }
     
     private void InitWithoutNewFile(){
@@ -63,27 +63,11 @@ public class CameraLive implements SurfaceHolder.Callback, OnInfoListener
     
     /* Create a File for saving an image or video*/ 
     private static File getOutputMediaFile(){
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.
-
-        File mediaStorageDir = new File(Environment.getExternalStorageDirectory()+"/testRay/", "MyCameraApp");
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
-                Log.d("MyCameraApp", "failed to create directory");
-                return null;
-            }
-        }
+        File mediaStorageDir = Functions.getInstance().fileLocation();
 
         // Create a media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-            "VID_"+ timeStamp + ".mp4");
-
+        File mediaFile = new File(mediaStorageDir.getPath() + File.separator +"_"+ timeStamp + ".mp4");
         return mediaFile;
     }
     
@@ -103,6 +87,11 @@ public class CameraLive implements SurfaceHolder.Callback, OnInfoListener
         	//mRecorder.setCamera(Camera.ope));
             mRecorder.setPreviewDisplay(mHolder.getSurface());
             mRecorder.prepare();
+            if(mCameraView!=null){
+            	mCameraView.setWillNotDraw(false);
+            }else{
+            	Functions.getInstance().makeToast("camera view not draw nill");
+            }
         }
         catch (IllegalStateException e)
         {
@@ -115,22 +104,22 @@ public class CameraLive implements SurfaceHolder.Callback, OnInfoListener
     }
 
 
-    public void UI_StartPreview()
+    public String UI_StartPreview()
     {
         if(mState == STATE_STOPPED || mState == STATE_NONE)
         {
             mRecorder= new MediaRecorder();
-            Init();
+            String filename = Init();
 
-            mCameraView= new CameraOverlay(mContext);
+            mCameraView= new CameraOverlay(mContext,"0");
             mParent.addView(mCameraView);
 
             this.mHolder = mCameraView.getHolder();
             this.mHolder.addCallback(this);
             this.mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-            
-            
+            return filename;
         }
+        return "";
     }
 
 
@@ -227,6 +216,7 @@ public class CameraLive implements SurfaceHolder.Callback, OnInfoListener
     public void surfaceCreated(SurfaceHolder holder) 
     {   
         Prepare();
+        
     }
 
 
@@ -243,5 +233,11 @@ public class CameraLive implements SurfaceHolder.Callback, OnInfoListener
     {
         mState= STATE_STOPPED;
         this.UI_StopRecord();
+    }
+    
+    public void setOverlayMessage(DataPoint point){
+    	if(mCameraView!=null && mHolder != null){
+    		mCameraView.setDisplayMessage(point);
+    	}
     }
 }

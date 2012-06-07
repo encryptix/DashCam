@@ -1,10 +1,14 @@
 package com.raymond.dashcam;
 
+import java.io.File;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Environment;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -69,7 +73,7 @@ public class Functions {
             _parent.startActivity(i);
             break;
         case CAMERA:
-        	i.setClassName("com.raymond.dashcam", "com.raymond.dashcam.CameraScreen");
+        	i.setClassName("com.raymond.dashcam", "com.raymond.dashcam.MergedScreen");
             _parent.startActivity(i);
         	break;
         case GPSSETTING:
@@ -88,5 +92,19 @@ public class Functions {
     public void foo(){
     	PackageManager pm = _parent.getPackageManager();
     	//pm.
+    }
+    
+    public File fileLocation(){
+    	// To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory()+"/testRay/", "MyCameraApp");
+        // Create the storage directory if it does not exist
+        if (! mediaStorageDir.exists()){
+            if (! mediaStorageDir.mkdirs()){
+                Log.d("MyCameraApp", "failed to create directory");
+                return null;
+            }
+        }
+        return mediaStorageDir;
     }
 }
